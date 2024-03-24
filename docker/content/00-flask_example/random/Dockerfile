@@ -2,7 +2,7 @@
 FROM python:3.9.19-alpine as base
 
 # Instalar las dependencias globales requeridas para todas las aplicaciones
-RUN pip install gunicorn
+RUN pip install --no-cache-dir gunicorn flask requests
 
 # Etapa 2: Construir la aplicación Flask
 FROM base as builder
