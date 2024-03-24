@@ -14,7 +14,7 @@ def generate_random_number():
 # Ruta para manejar errores 404
 @app.errorhandler(404)
 def page_not_found(error):
-    # Devolver un mensaje JSON con la descripción del error y establecer cabeceras para la respuesta de error 404
+    # Devolvemos template html con gatito llorando
     response = render_template("error.html", title="Crying Cat", message="404 Not Found")
 
     return response, 404
