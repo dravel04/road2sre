@@ -14,10 +14,10 @@ WORKDIR /app
 COPY . /app
 
 # Expone el puerto 8001
-EXPOSE 8001
+EXPOSE 8002
 
 # Define el comando principal que se ejecutará al iniciar el contenedor
 ENTRYPOINT ["gunicorn"]
 
 # Proporciona los argumentos adicionales para iniciar la aplicación
-CMD ["--bind", "0.0.0.0:8001", "flask_checker:app"]
+CMD ["--bind", "0.0.0.0:8002", "flask_checker:app"]
