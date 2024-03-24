@@ -17,4 +17,4 @@ EXPOSE 8001
 ENTRYPOINT ["gunicorn"]
 
 # Proporciona los argumentos adicionales para iniciar la aplicación
-CMD ["--bind", "0.0.0.0:8001", "app:app"]
+CMD ["--bind", "0.0.0.0:8001", "flask_random:app"]
