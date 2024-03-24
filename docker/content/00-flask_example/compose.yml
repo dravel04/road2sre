@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  flask-random:
+    image: flask-random
+    ports:
+      - "8001:8001"
+  flask-checker:
+    image: flask-checker
+    ports:
+      - "8002:8002"
