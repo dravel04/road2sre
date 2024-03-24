@@ -11,5 +11,8 @@ def hello_microservice():
 
 # Nos aseguramos de que esta linea solo se lance cuando ejecutamos el script de forma independiente
 if __name__ == "__main__":
+<<<<<<< HEAD
 	# print(__name__)
+=======
+>>>>>>> 8483890 (Añadimos entrada a gitignore)
 	app.run(port=8000)
