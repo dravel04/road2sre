@@ -1,14 +1,17 @@
-# Usamos como imagen base una version ligera de python
-FROM python:3.9.19-alpine
+# Etapa 1: Construir la imagen base con Python y pip instalados
+FROM python:3.9.19-alpine as base
 
-# Establece el directorio de trabajo en /app
+# Instalar las dependencias globales requeridas para todas las aplicaciones
+RUN pip install gunicorn
+
+# Etapa 2: Construir la aplicación Flask
+FROM base as builder
+
+# Establecer el directorio de trabajo en /app
 WORKDIR /app
 
-# Copia el código de la aplicación al contenedor
+# Copiar el código de la aplicación
 COPY . /app
-
-# Instala las dependencias de la aplicación
-RUN pip install flask gunicorn
 
 # Expone el puerto 8001
 EXPOSE 8001
