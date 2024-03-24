@@ -1,3 +1,3 @@
 # Python
 
-- [Functions](docs/functions.md)
+- [Functions](content/functions/README.md)
