@@ -12,7 +12,7 @@ Ejemplo sencillo donde tenemos dos microservicios `random` y `check`.
     - Los `Dockerfile` se han pensado para que hagan `multi-stage build`, donde encapsulamos python y las dependencias como `base` y el codigo de la app como `builder`
     - `compose.yml` se ha diseñado de tal forma que haga el build directamente
 
-## TODO:
+### TODO:
 - [ ] Seguridad: Asegúrate de implementar medidas de seguridad adecuadas, como autenticación y autorización, para proteger tus endpoints y datos sensibles.
 - [ ] Manejo de errores: Además de manejar el error 404, implementa un manejo de errores más completo para otros posibles errores que puedan ocurrir en tu aplicación.
 - [ ] Logging: Agrega un sistema de registro (logging) para registrar eventos importantes y errores, lo que facilitará la depuración y el monitoreo de la aplicación en producción.
@@ -21,3 +21,7 @@ Ejemplo sencillo donde tenemos dos microservicios `random` y `check`.
 - [ ] Monitorización y métricas: Implementa herramientas de monitorización y recopilación de métricas para supervisar el rendimiento de tu aplicación en producción y para identificar posibles cuellos de botella.
 - [ ] Optimización de rendimiento: Realiza pruebas de rendimiento y optimiza tu código y configuración para garantizar una respuesta rápida y eficiente a las solicitudes de los clientes.
 - [ ] Actualizaciones y mantenimiento: Establece un pipelines para realizar actualizaciones de forma segura y para mantener tu aplicación con las últimas correcciones de errores y mejoras.
+
+
+## [01-rundeck_deploy](./content/01-rundeck_deploy/)
+PoC de despliegue en contenedores de la versión comunity edition de rundeck.
