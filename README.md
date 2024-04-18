@@ -8,3 +8,5 @@ Repositorio donde alojar todos los recursos, contenido y proyectos que vaya real
 - [Python](./python/)
 - [Docker](./docker/)
 - [Linux](./linux/)
+- [Kubernetes](./kubernetes/)
+- [Terrafrom](./terraform/)
