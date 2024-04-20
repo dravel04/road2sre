@@ -25,3 +25,6 @@ Ejemplo sencillo donde tenemos dos microservicios `random` y `check`.
 
 ## [01-rundeck_deploy](./content/01-rundeck_deploy/)
 PoC de despliegue en contenedores de la versión comunity edition de rundeck.
+### TODO:
+- [ ] Usar `remco` para definir los ficheros de configuración
+
