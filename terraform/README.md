@@ -79,4 +79,4 @@ Encapsula recursos, variables, salidas y otros elementos relacionados. Permite c
 - [Provisioners](https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax)
 - [Workspaces](https://developer.hashicorp.com/terraform/language/state/workspaces)
 
-### [Curso](https://kodekloud.com/certificate-verification/2DEF3DB21713-2DEF37BC379D-2DEF377F06C5/)
+### [Cert. Curso](https://kodekloud.com/certificate-verification/2DEF3DB21713-2DEF37BC379D-2DEF377F06C5/)
