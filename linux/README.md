@@ -4,3 +4,7 @@ Este temario no será muy extenso ya que, además de ser conocimiento trasversal
 - [Modelo OSI](content/osi.md)
 - [Viviendo en la terminal](content/terminal.md)
 - [Servidores](content/servers.md)
+
+
+## Links de interés
+- [Bash cheatsheets](https://devhints.io/bash)
