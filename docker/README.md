@@ -28,3 +28,6 @@ PoC de despliegue en contenedores de la versión comunity edition de rundeck.
 ### TODO:
 - [ ] Usar `remco` para definir los ficheros de configuración
 
+
+## Links de interés
+- [Dockerfile Linter](https://github.com/hadolint/hadolint)

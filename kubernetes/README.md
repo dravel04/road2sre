@@ -29,3 +29,5 @@ Es una definición que asegura que exista una copia del pods en **CADA UNO** de 
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
 > Definidos en `/etc/kubernetes/manifests`
 - [Multiple Scheduler](https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/)
+- [CKAD Udemy](https://www.udemy.com/course/certified-kubernetes-application-developer/?couponCode=2021PM20)
+- [K9s](https://k9scli.io/)
