@@ -4,7 +4,8 @@ Espacio para anotar los detalles que me parezcan mas importantes del curso. Ya q
 
 ## Test Previo
 - Which AWS service can you use to troubleshoot EKS Control Plane logs? **CloudWatch Logs**
-> [!NOTE] `Container Insights` summarizes metrics and logs for Containerized applications. **EKS Control Plane logs are not collected by CloudWatch container Insights**.
+> [!NOTE] 
+> `Container Insights` summarizes metrics and logs for Containerized applications. **EKS Control Plane logs are not collected by CloudWatch container Insights**.
 - **Container Isolation - Namespaces:** feature del kernel de Linux que permite limitar los procesos a los que tiene acceso otro proceso
 - **Container Isolation - cgroups:** feature del kernel de Linux que permite limitar los recursos (cpu, memoria, disco I/O, network, etc) a los que tiene acceso un proceso
 
