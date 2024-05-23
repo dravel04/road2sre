@@ -14,10 +14,14 @@ Espacio para anotar los detalles que me parezcan mas importantes del curso. Ya q
 ### Infra
 - `EKS` despliega por ti el **control plane** que consta de 2 instancias EC2 con la API, Scheduler, etc y otras 3 instancias para `etcd`
 - `stateful` objeto de kubernetes pensado para aplicaciones que no pueden ser efímeras como una DB. Para garantizar la persistencia entran en juego los conceptos de `Persistent Volume Claim (pvc)` y `Persistent Volume (pv)`, el primero es la petición que hace kubernetes para solicitar un recurso de almacenamiento (local, EBS, EFS, etc) y el segundo es el recurso en sí, el volumen que montaremos en nuestro pods
+> [!NOTE]
+> `ReplicaSets` comparten un PVC con todos los pods definidos en este mientras `StatefulSets` crea un PVC por pod
 - `Liveness, Readiness and Startup Probes` nos permiten configurar health checks nativos de kubernetes para verificar el estado de una aplicación a los cuales podemos añadir lógica en base a condiciones como reiniciar el pod en base a X fallos, etc
 - La **Autenticación** y **autorización**, funciona de la siguiente forma:
 ![Auth](Auth.png)
 - El concepto de `ServiceAccount` en Kubernetes se utiliza principalmente para definir los permisos y la identidad de los pods dentro del clúster, es decir, para la gestión de permisos de "dentro hacia afuera". Para la asociación de permisos a usuarios externos como testers, desarrolladores, etc., se utilizan otros mecanismos de autenticación y autorización que pueden ser gestionados a nivel de `IAM (Identity and Access Management)` en la nube donde se ejecuta el clúster de Kubernetes o a través de otros sistemas de gestión de identidades.
+
+
 
 ### Networking
 - `service` solo operan en la `capa 4` manejando tráfico `TCP/UDP`. Los puertos definidos en `service` se definen a nivel de `namespace` por lo que podríamos usar el mismo número de puerto en diferentes `namespaces`
@@ -36,7 +40,32 @@ Espacio para anotar los detalles que me parezcan mas importantes del curso. Ya q
     - `CloudWatch Container Insight` utiliza `CloudWatch agent` desplegado en cada nodo para recolección de métricas del rendimiento o recursos usados (consumo de CPU, memoría, etc) por los servicios desplegados
 - `Amazon X-Ray` proporciona herramientas para rastrear las solicitudes a través de las distintas partes de la aplicación, identificando cuellos de botella y problemas de rendimiento. Recopila datos sobre las solicitudes a medida que se propagan a través de los diferentes componentes del servicio (LoadBalancers, DB, etc) que nos permite obtener una visión detallada de la latencia, identificar errores y optimizar el rendimiento de las aplicaciones.
 
+### Autoscaling
+- [`Horizontal Pod Autoscaler (HPA)`](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) objeto de Kubernetes que podemos definir para que escale horizontalmente **nuestros pods** ante un evento o un threshold definido
+    - Usando `metric server` realizando consultas a `kubelet` de cada nodo
+    - Usando `Prometheus Adapter` usando las métricas del propio Prometheus para realizar el escalado
+    - Usando `KEDA` usando eventos para realizar el escalado
+- [`Cluster Autoscaler (CAS)`](https://kubernetes.io/docs/concepts/cluster-administration/cluster-autoscaling/) la idea es similar a la anterior, pero desde el punto de vista de los nodos, es decir, permite crear nuevos nodos en base a la carga de nuestro cluster
+    - Usando [`Karpenter`](https://karpenter.sh/) sin necesidad de mucha configuración adicional
+        1. Analiza los pods que no se puede desplegar
+        2. Analiza es listado de tipos de nodos que permitimos desplegar
+        3. Despliega la instancia con menor coste para satisfascer el despliegue de estos pods
+        4. Analiza constantemente si puede consolidar los pods existentes en los nodos desplegados con el fin de tener el mínimo de nodos posibles
+> [!NOTE]
+> Puedes definir diferentes agentes de provisioning y asignarles pesos para que priorice el uso de los de menor peso
+- **Reducción de costes** depende del tipo de instancia que usemos en nuestros nodos, puede suponer una gran reducción de costes
+    - `On-demand Instances` pagamos por el tiempo de uso de la instancia y es aprovisionada en el momento que la necesitemos. Pensadas para cargas de trabajo variables
+    - `Saving Plans` cerramos un precio concreto por un o grupo de instancias con recursos prefijados. Ideal para cagas de trabajo fijas
+    - `Spot Instances` similar a las instancias `on-demand` con la salvedad de estas instancias "no nos pertenecen", es decir, si algún cliente `on-demand` necesita nuestra instancia AWS nos matará la instancia y nos dará otra. El tiempo de preaviso para esta operación es de 2min, por lo que nuestra aplicación tiene que ser tolerante a fallos si usamos esta configuración. Supone un ahorra del 90% frente a las `on-demand`
+- [`KubeCost`](https://www.kubecost.com/) aplicación que podemos desplegar en nuestro cluster que nos da un reporte de costes de nuestro cluster a nivel de namespace, pod, etc. Ya que no existe una forma de nativa de explorar costes con cierta granularidad en un cluster de kubernetes, `kubecost` es una buena opción
 
+## GitOps
+Repositorios Git como fuente de verdad. Cualquier cambio en estos, desencadenará un flujo de CI/CD para desplegar/actualizar los recursos necesarios en nuestro cluster de kubernetes. Algunas de las herramientas más populares son: `Flux` o `ArgoCD`. Adcionalmente, cabe destacar `Kustomize` herramienta de templating que nos permite tener plantillas para la definición de nuestro recursos
+
+> [!TIPS]
+> Para configurar las credenciales del clúster de una pipeline de **GitHub Actions** habilitando la implementación de microservicios en un clúster de EKS:
+> 1. Almacenar la `AWS Access Key` y `Secret Key` de AWS como secretos en el repositorio de GitHub
+> 2. Configurar variables de entorno para usar estos secretos junto con los detalles del clúster de EKS (nombre, región) para conectarse al clúster de EKS
 
 ### Aplicaciones
 - Los pasos a tener en cuenta cuando queremos desplegar una app en nuestro cluster de kubernetes mediante `raw manifest` son:
@@ -68,3 +97,11 @@ Algunas respuestas de los tests:
 - Which query language is used by Amazon Managed Service for Prometheus? `PromQL`
 - What does a 'trace' typically represent in observability? `The entire lifecycle of a request`
 - What is observability? `The ability to understand the state of a system from its outputs`
+- Within a single node group, when using Cluster Autoscaler, It's best practice to use instance types with a range of different CPU and memory specifications (true/false) `false` porque mezclar diferentes tipos de instancias dentro de un solo node group complica el proceso de escalado automático, hace menos predecible la disponibilidad de recursos y dificulta la optimización del uso de recursos. La práctica recomendada es mantener la homogeneidad de los nodos dentro de cada node group.
+- The _______ pattern can be used to ensure we always have an amount of spare capacity in the data plane. `Over-provisioning`
+- Karpenter's ________ feature intelligently launches cheaper instances to more densely pack existing pods reducing costs. `Consolidation`
+- Which of the following is a key principle of GitOps? `Declarative infrastructure as code`
+- In GitOps, where is the desired infrastructure and application state defined? `In a separate Git repository`
+- Which Flux component is responsible for reconciling the desired state from Git with the actual state in a Kubernetes cluster? `Flux Operator`
+
+
