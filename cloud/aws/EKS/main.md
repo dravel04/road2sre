@@ -62,7 +62,7 @@ Espacio para anotar los detalles que me parezcan mas importantes del curso. Ya q
 ## GitOps
 Repositorios Git como fuente de verdad. Cualquier cambio en estos, desencadenará un flujo de CI/CD para desplegar/actualizar los recursos necesarios en nuestro cluster de kubernetes. Algunas de las herramientas más populares son: `Flux` o `ArgoCD`. Adcionalmente, cabe destacar `Kustomize` herramienta de templating que nos permite tener plantillas para la definición de nuestro recursos
 
-> [!TIPS]
+> [!TIP]
 > Para configurar las credenciales del clúster de una pipeline de **GitHub Actions** habilitando la implementación de microservicios en un clúster de EKS:
 > 1. Almacenar la `AWS Access Key` y `Secret Key` de AWS como secretos en el repositorio de GitHub
 > 2. Configurar variables de entorno para usar estos secretos junto con los detalles del clúster de EKS (nombre, región) para conectarse al clúster de EKS
