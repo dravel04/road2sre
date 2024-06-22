@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="css/basic.css">
 </hhee>
 <body>
-<h1 class="title">First steps</h1>
+<h1 id="title">First steps</h1>
 <h2>Index</h2>
-<ol class="index">
+<ol id="index">
     <li>element1</li>
     <li>element2</li>
-    <li>element3</li>
+    <a href="#contact"><li>Contact</li></a>
     <li>element4</li>
     <li>element5</li>
 </ol>
@@ -41,9 +41,9 @@
 
 <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tempore illo odit, non pariatur exercitationem ipsam? Asperiores officiis quasi molestias id ipsa, aperiam fugiat accusamus. Ab veritatis ipsum assumenda velit quod.</p>
 
-<section>
+<section id="contact">
     <h2>Contact</h2>
-    <form action="/" method="post">
+    <form action="/webdev/htmlcss/basic.html" method="get">
         <!-- The name attribute is used to identify the selected file on the server. The id attribute is used to identify the element in the DOM. -->
         <fieldset>
             <legend>Personal Info</legend>
@@ -94,8 +94,13 @@
                 });
             </script>
         </fieldset>
-        <input type="submit" value="Send">
+        <div class="submit">
+            <input type="submit" value="Send" class="goto">
+        </div>
     </form>
 </section>
+<footer>
+    <p>road2sre &copy; 2024</p>
+</footer>
 </body>
 </html>
