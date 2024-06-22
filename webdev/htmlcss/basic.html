@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- The viewport meta tag ensures that the webpage is rendered at the correct size on different devices and screen resolutions. The initial-scale=1.0 part sets the initial zoom level when the page is first loaded. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>basic</title>
+
+    <link rel="stylesheet" href="css/basic.css">
+</hhee>
+<body>
+<h1 class="title">First steps</h1>
+<h2>Index</h2>
+<ol class="index">
+    <li>element1</li>
+    <li>element2</li>
+    <li>element3</li>
+    <li>element4</li>
+    <li>element5</li>
+</ol>
+<!-- The target attribute specifies where to open the linked document. '_blank' opens the linked document in a new browser window or tab. The nofollow attribute tells search engines not to follow the link. -->
+<a href="http://www.google.com" target="_blank" rel="nofollow">
+    <button class="goto">Go to google</button>
+</a>
+
+<h3>List</h3>
+<ul>
+    <li>another1</li>
+    <li>another2</li>
+</ul>
+
+<br>
+<!-- The sizes attribute specifies the size of the image in terms of viewport width. -->
+<!-- The srcset attribute is used to provide multiple image sources and their corresponding conditions. -->
+<img 
+ src="../../img/logo.png" 
+ alt="road2sre logo" 
+ width="400"
+ height="305"
+>
+
+<p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tempore illo odit, non pariatur exercitationem ipsam? Asperiores officiis quasi molestias id ipsa, aperiam fugiat accusamus. Ab veritatis ipsum assumenda velit quod.</p>
+
+<section>
+    <h2>Contact</h2>
+    <form action="/" method="post">
+        <!-- The name attribute is used to identify the selected file on the server. The id attribute is used to identify the element in the DOM. -->
+        <fieldset>
+            <legend>Personal Info</legend>
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" placeholder="John Smith">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="hi@example.com">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password">
+            <label for="spam">Get notifications</label>
+            <input type="checkbox" name="spam" id="spam">
+        </fieldset>
+        <fieldset>
+            <legend>Preferences</legend>
+            <datalist id="subtimelist">
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+            </datalist>
+            <label for="subinit">Subcription init:</label>
+            <input type="date" name="subinit" id="subinit">
+            <label for="subtime">Subscription time: <span id="subtimevalue">1</span></label>
+            <input type="range" name="subtime" id="subtime" list="subtimelist" value="1" min="1" max="12">
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const subtimeInput = document.getElementById('subtime');
+                    const validValues = Array.from(document.getElementById('subtimelist').children).map(node => node.value);
+                    let subtimevalue = document.getElementById('subtimevalue');
+
+                    subtimeInput.addEventListener('input', function() {
+                        let currentValue = this.value;
+
+                        // Validar si el valor actual está en la lista de valores permitidos
+                        if (!validValues.includes(currentValue)) {
+                            // Si no está en la lista, ajustar el valor al más cercano
+                            let closestValue = validValues.reduce(function(prev, curr) {
+                                return (Math.abs(curr - currentValue) < Math.abs(prev - currentValue) ? curr : prev);
+                            });
+
+                            this.value = closestValue; // Establecer el valor más cercano permitido
+
+                            subtimevalue.innerText = closestValue;
+                        }
+                        subtimevalue.innerText = this.value;
+                    });
+                });
+            </script>
+        </fieldset>
+        <input type="submit" value="Send">
+    </form>
+</section>
+</body>
+</html>
