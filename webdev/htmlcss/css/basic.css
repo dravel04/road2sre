@@ -24,6 +24,7 @@ body {
 .goto:active {
     background-color: rgb(155, 26, 114);
 }
+
 form {
     width: 350px;
 }
@@ -33,17 +34,42 @@ fieldset {
     padding: 20px;
     width: 100%;
     display: grid;
-    grid-template-columns: auto 1fr; /* Define las columnas: etiqueta y input */
+    grid-template-columns: auto 1fr; /* Define las columnas: etiqueta y input. Aplica al orden de aparicion de los elementos */
     gap: 5px 20px;
 }
-section {
-    width: 300px;
-}
+
 form .submit {
     margin: 5px;
     display: grid;
     padding-inline: 40px;
 }
+
+.container {
+    width: 150px;
+    height: 150px;
+    background: white;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 40px;
+    overflow: auto;
+}
+
+.parent {
+    border: 5px solid black;
+    width: 200px;
+    height: 200px;
+    box-sizing: border-box;
+    position: relative;
+}
+.child {
+    background-color: blueviolet;
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
 footer p {
     text-align: center;
 }
