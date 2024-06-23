@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/shuflle.css">
+    
+    <title>Shuffle Animation</title>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const defAnimationTime = (element, start, delay, zIndex) => {
+            setTimeout(() => {
+                element.style.animationPlayState = 'running';
+                element.style.zIndex = null;
+            }, start);
+            setTimeout(() => {
+                element.style.animationPlayState = 'paused';
+                element.style.zIndex = 1;
+            }, start+delay);
+        };
+
+        const blueDiv = document.querySelector('div:nth-child(3)');
+        const zBlueDiv = window.getComputedStyle(blueDiv).getPropertyValue('z-index');
+        const redDiv = document.querySelector('div:nth-child(2)');
+        const zRedDiv = window.getComputedStyle(redDiv).getPropertyValue('z-index');
+        const yellowDiv = document.querySelector('div:first-child');
+        const zYellowDiv = window.getComputedStyle(yellowDiv).getPropertyValue('z-index');
+        
+        // Primera ejecucion
+        defAnimationTime(blueDiv, 0, 3000, zBlueDiv);
+        defAnimationTime(redDiv, 3000, 3000, zRedDiv);
+        defAnimationTime(yellowDiv, 6000, 3000, zYellowDiv);
+        // Intervalo de repeticion de las animaciones
+        setInterval(() => {
+            defAnimationTime(blueDiv, 0, 3000, zBlueDiv);
+            defAnimationTime(redDiv, 3000, 3000, zRedDiv);
+            defAnimationTime(yellowDiv, 6000, 3000, zYellowDiv);
+        }, 9000);
+    });
+    
+    </script>
+</head>
+<body>
+    <section>
+        <div class="card"></div>
+        <div class="card"></div>
+        <div class="card"></div>
+    </section>
+</body>
+</html>

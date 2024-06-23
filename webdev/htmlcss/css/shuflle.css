@@ -1,0 +1,85 @@
+section {
+    padding-top: 300px;
+}
+
+div.card {
+    border: 1px solid black;
+    width: 130px;
+    height: 150px;
+    box-shadow: 0 0 5px black;
+    position: relative;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
+}
+div:first-child {
+    background-color: yellow;
+    z-index: 2;
+    top: 0px;
+    animation-name: shuffleYellow;
+}
+div:nth-child(2) {
+    background-color: red;
+    z-index: 3;
+    top: -150px;
+    animation-name: shuffleRed;
+}
+div:nth-child(3) {
+    background-color: blue;
+    z-index: 4;
+    top: -300px;
+    animation-name: shuffleBlue;
+}
+
+@keyframes shuffleBlue {
+    0% {
+        top: -300px;
+    }
+    50% {
+        top: -500px;
+        z-index: 5;
+    }
+    51% {
+        top: -500px;
+        z-index: 1;
+    }
+    100% {
+        top: -300px;
+        z-index: 1;
+    }
+}
+@keyframes shuffleRed {
+    0% {
+        top: -150px;
+    }
+    50% {
+        top: -350px;
+        z-index: 5;
+    }
+    51% {
+        top: -350px;
+        z-index: 1;
+    }
+    100% {
+        top: -150px;
+        z-index: 1;
+    }
+}
+@keyframes shuffleYellow {
+    0% {
+        top: 0px;
+    }
+    50% {
+        top: -200px;
+        z-index: 5;
+    }
+    51% {
+        top: -200px;
+        z-index: 1;
+    }
+    100% {
+        top: 0px;
+        z-index: 1;
+    }
+}
+
