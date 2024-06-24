@@ -8,34 +8,51 @@
     <title>Shuffle Animation</title>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const defAnimationTime = (element, start, delay, zIndex) => {
+        const defAnimationTime = (element, start, delay, waitingZindex) => {
             setTimeout(() => {
                 element.style.animationPlayState = 'running';
-                element.style.zIndex = null;
+                element.style.removeProperty('z-index');
             }, start);
             setTimeout(() => {
                 element.style.animationPlayState = 'paused';
-                element.style.zIndex = 1;
+                element.style.zIndex = waitingZindex;
             }, start+delay);
         };
+        const retoreZIndex = (element, zIndex) => {
+            console.log('aplico reset zindex')
+            element.style.zIndex = zIndex;
+        };
+
+        const root = document.documentElement;
+        const animationDuration = parseFloat(
+            getComputedStyle(root).getPropertyValue('--animationDuration')
+        )*1000;
+        const zBlueDiv = getComputedStyle(root).getPropertyValue('--blueZindex');
+        const zRedDiv = getComputedStyle(root).getPropertyValue('--redZindex');
+        const zYellowDiv = getComputedStyle(root).getPropertyValue('--yellowZindex');
+        const wzBlueDiv = getComputedStyle(root).getPropertyValue('--waitingBlueZindex');
+        const wzRedDiv = getComputedStyle(root).getPropertyValue('--waitingRedZindex');
+        // const wzYellowDiv = getComputedStyle(root).getPropertyValue('--waitingYellowZindex');
 
         const blueDiv = document.querySelector('div:nth-child(3)');
-        const zBlueDiv = window.getComputedStyle(blueDiv).getPropertyValue('z-index');
         const redDiv = document.querySelector('div:nth-child(2)');
-        const zRedDiv = window.getComputedStyle(redDiv).getPropertyValue('z-index');
         const yellowDiv = document.querySelector('div:first-child');
-        const zYellowDiv = window.getComputedStyle(yellowDiv).getPropertyValue('z-index');
         
         // Primera ejecucion
-        defAnimationTime(blueDiv, 0, 3000, zBlueDiv);
-        defAnimationTime(redDiv, 3000, 3000, zRedDiv);
-        defAnimationTime(yellowDiv, 6000, 3000, zYellowDiv);
+        defAnimationTime(blueDiv, 0, animationDuration, wzBlueDiv);
+        defAnimationTime(redDiv, animationDuration, animationDuration, wzRedDiv);
+        defAnimationTime(yellowDiv, animationDuration*2, animationDuration, zYellowDiv);
         // Intervalo de repeticion de las animaciones
         setInterval(() => {
-            defAnimationTime(blueDiv, 0, 3000, zBlueDiv);
-            defAnimationTime(redDiv, 3000, 3000, zRedDiv);
-            defAnimationTime(yellowDiv, 6000, 3000, zYellowDiv);
-        }, 9000);
+            console.log('Inicio de la repeticion');
+            // Segunda ejecucion
+            retoreZIndex(yellowDiv, zYellowDiv);
+            retoreZIndex(redDiv, zRedDiv);
+            retoreZIndex(blueDiv, zBlueDiv);
+            defAnimationTime(blueDiv, 0, animationDuration, wzBlueDiv);
+            defAnimationTime(redDiv, animationDuration, animationDuration, wzRedDiv);
+            defAnimationTime(yellowDiv, animationDuration*2, animationDuration, zYellowDiv);
+        }, animationDuration*3);
     });
     
     </script>

@@ -1,3 +1,14 @@
+:root {
+    --flyZindex: 80;
+    --blueZindex: 70;
+    --redZindex: 60;
+    --yellowZindex: 50;
+    --waitingBlueZindex: 40;
+    --waitingRedZindex: 30;
+    /* --waitingYellowZindex: 20; */
+    --animationDuration: 2s;
+}
+
 section {
     padding-top: 300px;
 }
@@ -8,25 +19,25 @@ div.card {
     height: 150px;
     box-shadow: 0 0 5px black;
     position: relative;
-    animation-duration: 3s;
+    animation-duration: var(--animationDuration);
     animation-iteration-count: infinite;
     animation-play-state: paused;
 }
 div:first-child {
     background-color: yellow;
-    z-index: 2;
+    z-index: var(--yellowZindex);
     top: 0px;
     animation-name: shuffleYellow;
 }
 div:nth-child(2) {
     background-color: red;
-    z-index: 3;
+    z-index: var(--redZindex);
     top: -150px;
     animation-name: shuffleRed;
 }
 div:nth-child(3) {
     background-color: blue;
-    z-index: 4;
+    z-index: var(--blueZindex);
     top: -300px;
     animation-name: shuffleBlue;
 }
@@ -37,7 +48,7 @@ div:nth-child(3) {
     }
     50% {
         top: -500px;
-        z-index: 5;
+        z-index: var(--flyZindex);
     }
     51% {
         top: -500px;
@@ -54,7 +65,7 @@ div:nth-child(3) {
     }
     50% {
         top: -350px;
-        z-index: 5;
+        z-index: var(--flyZindex);
     }
     51% {
         top: -350px;
@@ -71,7 +82,7 @@ div:nth-child(3) {
     }
     50% {
         top: -200px;
-        z-index: 5;
+        z-index: var(--flyZindex);
     }
     51% {
         top: -200px;
