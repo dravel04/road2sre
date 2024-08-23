@@ -23,6 +23,7 @@ La diferencia con `Taints and Tolerations` es que estos te garantizan que tus po
 Es una definición que asegura que exista una copia del pods en **CADA UNO** de los nodos del cluster
 > Por debajo, kubernetes aplica el selector `nodeSelector` con el nombre de cada node a cada pods de forma automática
 
+## Storage
 
 
 ## Links

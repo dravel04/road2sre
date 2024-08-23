@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: artifactory-volume-artifactory-0
+  namespace: jfrog
+spec:
+  capacity:
+    storage: 20Gi  # Asegúrate de que esto coincide con el tamaño solicitado por el PVC
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: k8s-pv
+  hostPath:
+    path: /var/lib/k8s-pv/artifactory-volume-artifactory-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-artifactory-postgresql-0
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: k8s-pv
+  hostPath:
+    path: /var/lib/k8s-pv/data-artifactory-postgresql-0
