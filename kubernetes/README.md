@@ -30,5 +30,8 @@ Es una definición que asegura que exista una copia del pods en **CADA UNO** de 
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
 > Definidos en `/etc/kubernetes/manifests`
 - [Multiple Scheduler](https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/)
+    - [Advanced Scheduling](https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/)
+    - [how-does-kubernetes-scheduler-work](https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work)
+    - [jvns k8s Scheduler](https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/)
 - [CKAD Udemy](https://www.udemy.com/course/certified-kubernetes-application-developer/?couponCode=2021PM20)
 - [K9s](https://k9scli.io/)
