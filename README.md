@@ -11,6 +11,7 @@ Repositorio donde alojar todos los recursos, contenido y proyectos que vaya real
 - [Kubernetes](./kubernetes/)
 - [Terrafrom](./terraform/)
 - [Jenkins](./jenkins/)
+- [Gitlab](./gitlab/)
 - [Cloud](./cloud/)
     * [AWS](./cloud/aws/)
 - [Desarrollo Web](./webdev)

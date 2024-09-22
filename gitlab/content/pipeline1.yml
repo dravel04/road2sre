@@ -1,0 +1,56 @@
+workflow:
+  name: Generate ASCII Artwork
+
+stages:
+   - build
+   - test
+   - docker
+   - deploy
+
+build_file:
+   stage: build
+   image: ruby:2.7
+   before_script:
+      - gem install cowsay
+      - chmod +x script.sh
+   script:
+      - ./script.sh
+   artifacts:
+      name: Dragon Text File
+      paths: 
+         - dragon.txt
+      expire_in: 1 day
+
+test_file:
+   stage: test
+   image: ruby:2.7
+   script:
+      - |
+         grep -i "dragon" dragon.txt
+   dependencies:
+      - build_file
+
+docker_build:
+   stage: docker
+   script:
+      - echo "docker build ...."
+
+docker_testing:
+   stage: docker
+   needs:
+      - docker_build
+   script:
+      - echo "testing docker container...." 
+
+docker_push:
+   stage: docker
+   needs:
+      - docker_testing
+   script:
+      - echo "docker push ...." 
+
+deploy_ec2:
+   stage: deploy
+   script:
+      - cat dragon.txt
+      - echo "deploying ... .. ."
