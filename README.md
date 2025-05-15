@@ -16,3 +16,4 @@ Repositorio donde alojar todos los recursos, contenido y proyectos que vaya real
     * [AWS](./cloud/aws/)
 - [Desarrollo Web](./webdev)
     * [HTML/CSS](./webdev/htmlcss/)
+- [AI](./ai)
