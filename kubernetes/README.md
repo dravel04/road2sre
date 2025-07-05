@@ -27,6 +27,7 @@ Es una definición que asegura que exista una copia del pods en **CADA UNO** de 
 
 
 ## Links
+- [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
 > Definidos en `/etc/kubernetes/manifests`
 - [Multiple Scheduler](https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/)
