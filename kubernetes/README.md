@@ -70,6 +70,27 @@ Similar:
 oc annotate route route-example router.openshift.io/cookie_name=myapp
 ```
 
+## Storage
+- `iSCSI`: Protocolo que permite el transporte de comandos SCSI (para discos) sobre una red IP estándar.
+  + Proporciona **acceso a nivel de bloque (block-level storage)**.
+  + Cada bloque de almacenamiento expuesto se denomina **LUN** (Logical Unit Number).
+  + Una LUN es una **unidad lógica de almacenamiento** que el cliente ve como un disco duro "en blanco" o "sin formatear".
+  + **El cliente es el responsable de formatear la LUN** con un sistema de archivos (ej., `ext4`, `NTFS`) y gestionarlo.
+  + **La Analogía LUN - LVM (VG, PV, LV):**
+    - **Discos Físicos (o particiones):** Serían los **Physical Volumes (PVs)** en LVM. Son las unidades de almacenamiento físicas subyacentes.
+    - **Pool de Almacenamiento Centralizado:** Un **Volume Group (VG)** en LVM agrupa múltiples PVs (discos o particiones) para crear un gran pool de almacenamiento contiguo. Esta es la capa de abstracción del hardware, similar a una "cabina de almacenamiento" o el "software de almacenamiento definido por software" que gestiona los discos físicos.
+    - **`LUN` (la unidad que se expone al servidor):** Un **Logical Volume (LV)** en LVM se crea a partir de ese VG. Un LV es un "disco virtual" que puedes formatear y usar. **Esta LV es directamente análoga a la LUN.** La LUN se "corta" de un pool de almacenamiento (como un `VG`) y se presenta a un servidor cliente vía iSCSI. La LUN abstrae la complejidad de dónde residen los datos físicamente en el pool.
+
+### StorageClass
+La `StorageClass` define los siguientes aspectos clave del almacenamiento, que son lo que permite a Kubernetes ser agnóstico al hardware de almacenamiento subyacente:
+- **El `Provisioner` (El "motor" de almacenamiento):** Este es el componente más importante. El `provisioner` es un driver (generalmente un Container Storage Interface (CSI) driver) que sabe cómo interactuar con un sistema de almacenamiento específico.
+    + Para **iSCSI**, la `StorageClass` apuntaría a un provisioner (por ejemplo, el driver de CSI de tu fabricante de almacenamiento, como Pure Storage o Dell EMC) que sabe cómo crear LUNs.
+    + Para **NFS**, la `StorageClass` apuntaría a un provisioner de NFS.
+    + El `provisioner` es el que realmente habla el protocolo de almacenamiento (iSCSI, NFS, etc.).
+- **Los Parámetros (El "cómo usarlo"):** Aquí es donde la `StorageClass` te permite especificar cómo se debe crear ese almacenamiento.
+    + **Tipo de filesystem:** Le dice al provisioner que formatee el volumen con `ext4` o `xfs` (en el caso de iSCSI).
+    + **Modo de acceso:** Puede definir si el volumen se debe montar como `ReadWriteOnce`, `ReadOnlyMany`, etc.
+    + **Nivel de rendimiento:** Algunas `StorageClass`s pueden definir un tier de rendimiento, como `ssd` o `hdd` para que el provisioner asigne el volumen desde el pool de discos adecuado.
 
 ## Links
 - [Courses roadmap](./roadmap.md)
