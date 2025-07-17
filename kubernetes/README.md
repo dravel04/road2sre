@@ -92,6 +92,76 @@ La `StorageClass` define los siguientes aspectos clave del almacenamiento, que s
     + **Modo de acceso:** Puede definir si el volumen se debe montar como `ReadWriteOnce`, `ReadOnlyMany`, etc.
     + **Nivel de rendimiento:** Algunas `StorageClass`s pueden definir un tier de rendimiento, como `ssd` o `hdd` para que el provisioner asigne el volumen desde el pool de discos adecuado.
 
+## [Health Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+- `Liveness Probe`:
+    + **Objetivo**: Saber si un contenedor está vivo y funcionando correctamente.
+    + **Acción si falla**: Kubernetes asume que la aplicación está en un estado irrecuperable y reinicia el contenedor.
+- `Readiness Probe`:
+    + **Objetivo**: Saber si un contenedor está listo para recibir tráfico.
+    + **Acción si falla**: Kubernetes no envia más peticiones al Pod, es decir, retira el Pod de los `Service Endpoints`. El Pod sigue corriendo, pero aislado. Cuando vuelve a estar "ready", se añade de nuevo a los Endpoints.
+- `Startup Probe`:
+    + **Objetivo**: Saber si un contenedor ha terminado de iniciarse completamente.
+    + **Acción si falla**: Si la sonda de inicio falla, Kubernetes reinicia el contenedor.
+    + **Uso**: Para aplicaciones que tardan mucho en arrancar. Mientras `Startup Probe` está funcionando, `Liveness Probe` y `Readiness Probe` se pausan para evitar que el Pod sea reiniciado o retirado de Endpoints prematuramente. Una vez que la sonda de inicio tiene éxito, las otras dos sondas toman el control.
+## [HorizontalPodAutoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+Controlador de Kubernetes que automáticamente escala el número de réplicas de un Pod (normalmente un `Deployment` o `StatefulSet`) hacia arriba o hacia abajo. Lo hace basándose en métricas de uso de recursos (como CPU o memoria) o en métricas personalizadas. Su objetivo es mantener la carga de trabajo de la aplicación dentro de los límites deseados para asegurar rendimiento y eficiencia. 
+
+- `kubectl autoscale` (cmd: `kubectl autoscale <tipo_recurso>/<nombre_recurso> --min=<min> --max=<max> --cpu-percent=<porcentaje>`)
+Comando para crear un `HPA` (Horizontal Pod Autoscaler) de forma rápida y sencilla. El `HPA` es un controlador que escala automáticamente el número de réplicas de un Pod dentro de un rango definido (mínimo y máximo), basándose en métricas (comúnmente el uso de CPU) para mantener una carga de trabajo óptima. Es una solución dinámica y reactiva a la demanda.
+
+**Ejemplo:**
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: longload
+  labels:
+    app: longload
+spec:
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: longload
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 60
+```
+## Container Image
+- `imagePullPolicy` es una configuración en el manifiesto de un recurso que crea Pods, como un Deployment, que le dice a Kubernetes cuándo debe intentar descargar una imagen de contenedor desde un registro de imágenes. Kubernetes comprueba si la imagen ya existe localmente en el nodo antes de decidir si la descarga o no, según esta política.
+    + `Always`: Kubernetes siempre intentará descargar la imagen del registro, incluso si ya existe una copia local en el nodo.
+        - Nota: Si el registro no está disponible o la imagen no se encuentra, el Pod no se iniciará.
+    + `IfNotPresent`: Kubernetes solo descargará la imagen si no la encuentra ya en la caché local del nodo. Si la imagen ya está en el nodo, la usará sin intentar descargarla de nuevo.
+    + `Never`: Kubernetes nunca intentará descargar la imagen del registro. Asume que la imagen ya está disponible localmente en el nodo.
+        - **Uso:** Muy específico para entornos con imágenes pre-cargadas en los nodos (quizás para despliegues offline o de alta seguridad), o cuando se usa un image daemon local que garantiza la disponibilidad de la imagen. Si la imagen no está presente localmente, el Pod fallará al iniciarse.
+
+## Deployment Strategies
+Una estrategia de despliegue define cómo Kubernetes (o OpenShift, que las extiende) actualiza una aplicación a una nueva versión. Dicta el orden en que los Pods antiguos se reemplazan por los nuevos, con el objetivo de minimizar o eliminar el tiempo de inactividad y gestionar el riesgo de la nueva versión.
+- `RollingUpdate`: Reemplaza Pods antiguos por nuevos de forma incremental y gradual, uno por uno o en pequeños lotes.
+Ofrece cero tiempo de inactividad si se configura correctamente. Es la estrategia por defecto y más común para aplicaciones de producción.
+```yaml
+strategy:
+    type: RollingUpdate # <--- Es la predeterminada, pero se puede especificar
+    rollingUpdate:
+      maxUnavailable: 25% # <--- Porcentaje de Pods que pueden estar no disponibles (ej: 1 de 3)
+      maxSurge: 25%       # <--- Porcentaje de Pods que pueden crearse extra (ej: 1 de 3)
+```
+- `Recreate`: Elimina todos los Pods antiguos y luego despliega todos los Pods de la nueva versión.
+Provoca tiempo de inactividad completo de la aplicación durante la actualización.
+Es la estrategia más sencilla, pero generalmente no se usa en producción.
+- `Blue/Green`: Despliega la nueva versión ("Verde") completamente en paralelo a la versión actual ("Azul").
+Una vez lista la "Verde", el tráfico se conmuta instantáneamente a ella.
+Permite un rollback inmediato y sin interrupciones, pero duplica los recursos temporalmente.
+- `Canary`: Despliega la nueva versión ("Canario") y dirige una pequeña fracción del tráfico hacia ella inicialmente.
+Si es estable, el tráfico se aumenta gradualmente hasta el 100%.
+Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos usuarios primero.
+
+
 ## Links
 - [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
