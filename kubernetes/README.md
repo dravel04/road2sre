@@ -140,7 +140,17 @@ spec:
     + `Never`: Kubernetes nunca intentará descargar la imagen del registro. Asume que la imagen ya está disponible localmente en el nodo.
         - **Uso:** Muy específico para entornos con imágenes pre-cargadas en los nodos (quizás para despliegues offline o de alta seguridad), o cuando se usa un image daemon local que garantiza la disponibilidad de la imagen. Si la imagen no está presente localmente, el Pod fallará al iniciarse.
 
-## Deployment Strategies
+## Deployments
+- `oc apply` (cmd: `oc apply -f <archivo.yaml>`)
+Es la forma declarativa principal de gestionar recursos. Crea el recurso si no existe, o actualiza solo las diferencias si ya lo hace, manteniendo tu YAML como la única fuente de verdad. Ideal para GitOps y automatización.
+
+- `oc patch` (cmd: `oc patch <tipo_recurso>/<nombre_recurso> [-p PATCH|--patch-file FILE]`)
+Aplica cambios específicos y puntuales a un recurso existente directamente en el clúster. No necesita el manifiesto completo, solo la porción a modificar. Útil para ajustes rápidos o scripting ad-hoc, pero no actualiza tu YAML local.
+
+> - `--dry-run=client`: Prueba local. El comando procesa el YAML, aplica cualquier lógica predeterminada, y te muestra el objeto final que enviaría al clúster, pero nunca llega a tocar la API del clúster
+> - `--dry-run=server`: El comando envía la solicitud a la API del clúster, pero le dice al servidor que no persista el recurso. El servidor realiza todas las validaciones (permisos, esquemas, existencia de otros recursos, etc.) como si fuera a crear/modificar el recurso de verdad, pero al final, descarta los cambios.
+
+### Deployment Strategies
 Una estrategia de despliegue define cómo Kubernetes (o OpenShift, que las extiende) actualiza una aplicación a una nueva versión. Dicta el orden en que los Pods antiguos se reemplazan por los nuevos, con el objetivo de minimizar o eliminar el tiempo de inactividad y gestionar el riesgo de la nueva versión.
 - `RollingUpdate`: Reemplaza Pods antiguos por nuevos de forma incremental y gradual, uno por uno o en pequeños lotes.
 Ofrece cero tiempo de inactividad si se configura correctamente. Es la estrategia por defecto y más común para aplicaciones de producción.
