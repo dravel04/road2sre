@@ -15,7 +15,8 @@ Comando para cambiar el proyecto (`namespace`) activo en tu sesión de CLI. Tamb
 - `oc scale` (cmd: `oc scale <tipo_recurso>/<nombre_recurso> --replicas=<numero>`)
 Comando para ajustar manualmente el número de réplicas de un recurso compatible (como un `Deployment`, `ReplicaSet` o `StatefulSet`). Es una acción directa y unívoca: estableces una cantidad fija de Pods que deseas mantener. El clúster se asegurará de que haya ese número exacto de réplicas en ejecución.
 
-
+- `oc diff` (cmd: `oc diff -f <archivo.yaml>`)
+Comando para mostrar las diferencias entre el estado actual de un recurso en el clúster y el estado deseado definido en un archivo YAML local. Te permite previsualizar los cambios que se aplicarían sin modificar realmente el recurso en el clúster. Es una herramienta esencial para revisar y validar las modificaciones antes de ejecutarlas con `oc apply` o `oc replace`.
 
 ### Images
 - `oc image info`: (cmd: `oc image info <imagestream>:<tag>` o `oc image info <registry>/<imagen>:<tag>`)
@@ -56,5 +57,22 @@ Comando que simplifica la creación de un objeto `Route`. Su función principal 
 - `Endpoints` (cmd: `oc get endpoints <nombre_del_servicio>` ~ `kubectl get endpoints`)
 Objeto estándar de Kubernetes que representa una lista de direcciones IP y puertos de los Pods que están funcionando y son accesibles para un Service. Los `Endpoints` no se crean directamente por el usuario; son gestionados automáticamente por Kubernetes (y OpenShift) para mantener actualizado el `Service` con la información de los Pods que lo respaldan
 
+## Templates
+Los `OpenShift Templates` son una forma de empaquetar y personalizar conjuntos de manifiestos YAML (`Deployment`, `Service`, `Route`, etc.) para su fácil despliegue. Funcionan como plantillas que usan parámetros (parameters) que el usuario rellena al momento de procesarlos con oc process. Son una característica específica de OpenShift, ideal para desplegar aplicaciones preconfiguradas o para simplificar la creación de recursos complejos a usuarios con menos experiencia.
 
+```shell
+# 1. Registras el manifiesto del template
+oc create -f <roster-template path .yaml>
+# 2. Lo usas para desplegar apps
+oc process roster-template -p MYSQL_USER=user1 -p MYSQL_PASSWORD=mypasswd -p INIT_DB=true | oc apply -f -
 
+cat roster-parameters.env <<EOF
+MYSQL_USER=user1
+MYSQL_PASSWORD=mypasswd
+IMAGE=registry.ocp4.example.com:8443/redhattraining/do280-roster:v2
+EOF
+oc process roster-template --param-file=roster-parameters.env | oc apply -f -
+
+# ?. Puedes revisar los cambios antes de aplicarlos
+oc process roster-template --param-file=roster-parameters.env | oc diff -f -
+```

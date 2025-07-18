@@ -171,6 +171,13 @@ Permite un rollback inmediato y sin interrupciones, pero duplica los recursos te
 Si es estable, el tráfico se aumenta gradualmente hasta el 100%.
 Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos usuarios primero.
 
+### [Kustomize](./docs/kustomize.md)
+
+**Kustomize** trabaja con directorios que contienen un archivo `kustomization.yaml` en la raíz. **Kustomize** soporta la composición y personalización de diferentes recursos como `deployment`, `service` y `secret`. Puedes usar parches (`patch`) para aplicar personalizaciones a distintos recursos. **Kustomize** tiene el concepto de base y overlays (superposiciones).
+
+### [Helm](./docs/helm.md)
+
+**Helm** es un gestor de paquetes para Kubernetes que te ayuda a definir, instalar y actualizar aplicaciones complejas. Utiliza Charts, que son paquetes preconfigurados de recursos de Kubernetes (Deployments, Services, etc.) basados en plantillas (`templates`). Puedes personalizar estos Charts usando archivos de valores (`values.yaml`) o pasándolos directamente. **Helm** facilita el versionado y la gestión del ciclo de vida de tus aplicaciones en el clúster.
 
 ## Links
 - [Courses roadmap](./roadmap.md)
@@ -182,3 +189,5 @@ Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos
     - [jvns k8s Scheduler](https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/)
 - [CKAD Udemy](https://www.udemy.com/course/certified-kubernetes-application-developer/?couponCode=2021PM20)
 - [K9s](https://k9scli.io/)
+- [GitOps and Kustomize](https://www.redhat.com/en/blog/your-guide-to-continuous-delivery-with-openshift-gitops-and-kustomize)
+- [Helm charts](https://helm.sh/docs/topics/charts/)
