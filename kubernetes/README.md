@@ -179,6 +179,23 @@ Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos
 
 **Helm** es un gestor de paquetes para Kubernetes que te ayuda a definir, instalar y actualizar aplicaciones complejas. Utiliza Charts, que son paquetes preconfigurados de recursos de Kubernetes (Deployments, Services, etc.) basados en plantillas (`templates`). Puedes personalizar estos Charts usando archivos de valores (`values.yaml`) o pasándolos directamente. **Helm** facilita el versionado y la gestión del ciclo de vida de tus aplicaciones en el clúster.
 
+## Authentication and Authorization
+
+- **Autenticación:** Ocurre en el Identity Provider.
+- **Autorización (OAuth):** El IdP te da un Token de Acceso para la aplicación cliente para que esta acceda a recursos protegidos en un Servidor de Recursos externo en tu nombre.
+- **Acceso a la aplicación cliente:** La aplicación cliente gestiona tu sesión con mecanismos propios o usando el ID Token de OIDC, no directamente el Token de Acceso OAuth.
+
+### Diferencia Clave: Usuarios Humanos vs. Service Accounts
+- **Usuarios Humanos (Cuentas Nominativas):**
+  * Para **personas** que interactúan con la API (`oc login`, `kubectl`, consola web).
+  * Autenticación vía **IdP externo** (LDAP, OIDC, etc.), suelen usar **tokens temporales** y/o MFA.
+  * El **`kubeconfig`** con estas credenciales es una llave de acceso sensible y debe protegerse bien.
+- **Service Accounts (SA):**
+  * Para **aplicaciones/procesos automatizados** que corren *dentro* del clúster (Ej: Argo CD, Flux).
+  * Sus **tokens se generan automáticamente** y se montan en los Pods.
+  * Es crucial aplicar el **Principio del Menor Privilegio**: dar solo los permisos estrictamente necesarios.
+
+
 ## Links
 - [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
