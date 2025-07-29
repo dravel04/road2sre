@@ -69,6 +69,98 @@ Similar:
 ```shell
 oc annotate route route-example router.openshift.io/cookie_name=myapp
 ```
+### Network Polices
+Las **Network Policies** funcionan como firewalls internos en Kubernetes/OpenShift, controlando la comunicación entre **Pods usando labels**, no IPs.
+- **Comunicación entre Namespaces**: Para permitir la comunicación entre Pods de diferentes namespaces, asigna una label al namespace de origen y crea una Network Policy que seleccione esa label para la regla de entrada (Ingress) o salida (Egress).
+- **Reglas Ingress/Egress a Nivel de Pod**: También puedes usar labels en Pods individuales para definir reglas específicas de entrada (quién puede conectarse a ellos) o salida (a dónde pueden conectarse).
+- **Selectores**:
+  + `spec.podSelector`: Selecciona los Pods de destino a los que aplica la política.
+  + `spec.ingress.from` (o `spec.egress.to`): Usa selectores de Pod y/o namespace (`namespaceSelector`, `podSelector`) para definir los Pods de origen (o destino para **Egress**) permitidos.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: <nombre-de-la-politica>
+  namespace: <namespace-donde-se-aplica>
+spec:
+  podSelector:  # <-- Siempre presente para seleccionar los pods de destino
+    matchLabels:
+      # Labels de los pods a los que se aplica esta política
+  # Opcionales, al menos uno de 'ingress' o 'egress' debe estar presente para que la política haga algo
+  ingress:      # <-- Sección para reglas de tráfico entrante
+  - from:
+      # Quién puede conectarse a los pods seleccionados
+    ports:
+      # A qué puertos pueden conectarse
+  egress:       # <-- Sección para reglas de tráfico saliente
+  - to:
+      # A dónde pueden conectarse los pods seleccionados
+    ports:
+      # Desde qué puertos pueden conectarse
+  policyTypes:  # <-- Opcional, pero buena práctica para definir el tipo de reglas (Ingress/Egress)
+    - Ingress
+    - Egress
+```
+
+`ipBlock`: es uno de los tipos de "fuente" que puedes especificar. Otros tipos son un `podSelector` (para Pods en el mismo Namespace) o una combinación de `podSelector` y `namespaceSelector` (para Pods en otros Namespaces)
+- `cidr`: 10.0.0.0/16: Define un bloque de direcciones IP usando la notación CIDR. El tráfico proveniente de cualquier IP dentro de este rango será permitido por esta regla.
+- `except`: (Opcional): Dentro de un ipBlock, puedes usar except para especificar una lista de CIDRs que deben ser excluidos del bloque principal. Esto es útil para permitir un rango grande pero denegar unas pocas IPs específicas dentro de él.
+```yaml
+ingress:
+- from:
+  - ipBlock:
+      cidr: 10.0.0.0/8 # Permite todo el 10.x.x.x
+      except:
+        - 10.0.0.0/16 # Excepto el 10.0.x.x
+        - 10.1.0.0/16 # Y el 10.1.x.x
+- from:
+  - podSelector:
+      matchLabels:
+        app: frontend # Selecciona cualquier pod con la label 'app: frontend'
+- from:
+  - namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: frontend-namespace # Selecciona el Namespace por su nombre
+    podSelector:
+      matchLabels:
+        role: web # De ese Namespace, solo pods con esta label
+  ports:
+    - protocol: TCP
+      port: 8080 # Solo se permite tráfico TCP al puerto 8080
+```
+
+
+### Zero-Trust
+Bloquear todo el tráfico por defecto y luego permitir explícitamente solo lo que es estrictamente necesario:
+
+```yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: my-app-namespace # Aplica esta política a cada namespace que quieras proteger
+spec:
+  podSelector: {} # Selecciona TODOS los pods en este namespace
+  policyTypes:
+    - Ingress # Solo controla el tráfico de entrada
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: my-app-namespace # Aplica esta política a cada namespace que quieras proteger
+spec:
+  podSelector: {} # Selecciona TODOS los pods en este namespace
+  policyTypes:
+    - Egress # Solo controla el tráfico de salida
+```
+
+Tras esto tenemos que dar acceso incluso a los services (y routes). También tenemos que crear otra regla para habilitar los probes.
+> Esto hay que aplicarlo namespace por namespace de forma individual
+
+
 
 ## Storage
 - `iSCSI`: Protocolo que permite el transporte de comandos SCSI (para discos) sobre una red IP estándar.

@@ -101,3 +101,7 @@ kubectl create role <nombre-role> -n <namespace> --verb=<verbo> --resource=<recu
 kubectl create rolebinding <nombre-rb> --role=<nombre-role> --serviceaccount=<namespace>:<nombre-sa> -n <namespace> (o desde un archivo YAML)
 ```
 4. Usar la SA: Asigna la SA al Pod o Deployment para que tu aplicación herede esos permisos. En el YAML del Pod/Deployment: `spec.template.spec.serviceAccountName: <nombre-sa>`
+
+## [Network Security](./oc-network.md)
+
+
