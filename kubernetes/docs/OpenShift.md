@@ -98,6 +98,21 @@ oc process roster-template --param-file=roster-parameters.env | oc apply -f -
 oc process roster-template --param-file=roster-parameters.env | oc diff -f -
 ```
 
+### Project templates
+Los **Project templates** en OpenShift permiten a los administradores definir un conjunto preconfigurado de recursos (como `Deployments`, `Services`, `Routes`, `PersistentVolumeClaims`, `Secrets`, etc.) y políticas que se aplicarán automáticamente cuando se crea un nuevo proyecto (Namespace) basado en ese template. Son una forma poderosa de estandarizar y automatizar el aprovisionamiento de entornos de aplicación completos o de proyectos con configuraciones base específicas.
+
+Se puede generar una plantilla inicial con el siguiente comando:
+```shell
+oc adm create-bootstrap-project-template -o yaml > file
+```
+> Para que un template sea usado por defecto al lanzar `oc new-project ...` es necesario definirla en el `project` **openshift-config** y añadir el template en el campo `spec` de `projects.config.openshift.io cluster`
+```yaml
+...
+spec:
+  projectRequestTemplate:
+    name: project-request
+```
+
 ## Authentication and Authorization
 
 ### Usuarios y Grupos en OpenShift
@@ -125,4 +140,12 @@ kubectl create rolebinding <nombre-rb> --role=<nombre-role> --serviceaccount=<na
 
 ## [Network Security](./oc-network.md)
 
+## Limitar Workloads
+Cluster Admin pueden configurar **project templates** para añadir recursos a todos los nuevos proyectos. Estos recursos pueden implementar permissions, quotas, network policies, etc
+
+- `Requests`: Es el mínimo garantizado de CPU/Memoria que un Pod pide. Ayuda al Scheduler a encontrar un nodo. Se aplican a contenedores individuales dentro de un **Pod**.
+- `Limits`: Es el máximo de CPU/Memoria que un contenedor puede usar. Si excede CPU, se limita; si excede Memoria, se termina. Se aplican a contenedores individuales dentro de un **Pod**.
+- [`ResourceQuota`](https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/building_applications/quotas): Límite agregado estricto de recursos (CPU, Memoria, número de Pods/Objetos) para un único Namespace. Rechaza creaciones que superen el límite. Se aplica a un **Namespace único**
+- `ClusterResourceQuota`: Límite agregado estricto de recursos para múltiples Namespaces seleccionados por etiquetas. Solo en OpenShift. Se aplica a **múltiples Namespaces** que cumplen ciertos criterios de selección (basados en etiquetas)
+- `LimitRange`: Establece los valores por defecto y límites máximos/mínimos para requests y limits de contenedores/Pods dentro de un Namespace. Su objetivo es asegurar que los desarrolladores especifiquen límites razonables y evitar que desplieguen Pods sin ellos. Se aplica a un **Namespace único**.
 
