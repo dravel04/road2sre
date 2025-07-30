@@ -26,15 +26,15 @@ Obtener metadatos y estado de imágenes vinculadas a `ImageStreams` o accesibles
 Herramienta independiente para inspeccionar detalladamente imágenes en cualquier registro (remoto o local) sin descargarlas. Proporciona información técnica de bajo nivel (capas, config, etc.) y no requiere un clúster.
 
 - `ImageStream` es un registro de imágenes virtual de OpenShift que actúa como un puntero con historial, **por proyecto**. Abstrae tus despliegues del registro externo y facilita la automatización del ciclo de vida de las imágenes. Mantiene un registro de las versiones de las imágenes a lo largo del tiempo.
-  + ** `oc set image-lookup`: (cmd:** `oc set image-lookup <nombre_imagestream> [--enabled=false]`)
+  + **`oc set image-lookup`**: (cmd:** `oc set image-lookup <nombre_imagestream> [--enabled=false]`)
   Comando para habilitar la "Política de Búsqueda Local" en un ``ImageStream`` específico. Al activarla, el `ImageStream` se vuelve descubrible por su nombre simple desde otros proyectos en el clúster. Esto facilita que otros `Deployments` (con permisos adecuados) usen imágenes de ese `ImageStream` sin necesidad de la ruta completa a su registro interno.
 
 - `ImageStreamTag` es una referencia específica a una etiqueta (versión) dentro de un `ImageStream`. Identifica una imagen particular por su digest SHA256 y es lo que tus Deployments observan para disparar actualizaciones. Es la representación versionada de una imagen dentro del `ImageStream`.
 
-- **`oc create istag`: (cmd: `oc create istag <nombre_imagestream>:**<tag_a_crear> --from-image <origen_imagen>`)
+- **`oc create istag`**: (cmd: `oc create istag <nombre_imagestream>:**<tag_a_crear> --from-image <origen_imagen>`)
 Comando para crear una nueva `ImageStreamTag` o para establecer una referencia fija e inmutable a una imagen específica de un registro externo. Si la etiqueta ya existe en el `ImageStream`, este comando fallará.
 
-- **`oc tag`: (cmd:` oc tag <origen_imagen_o_istag> <destino_imagestream>:**<tag_a_actualizar> [--scheduled]`)
+- **`oc tag`**: (cmd:` oc tag <origen_imagen_o_istag> <destino_imagestream>:**<tag_a_actualizar> [--scheduled]`)
 Comando para actualizar una `ImageStreamTag` existente de un `ImageStream`, haciendo que apunte a una nueva imagen externa o a otra `ImageStreamTag`. Es la herramienta principal para gestionar los cambios de versión de las etiquetas en un `ImageStream`, y puede configurarse con `--scheduled` para verificaciones periódicas del origen.
 
 
@@ -47,7 +47,7 @@ Comando para procesar (o renderizar) una plantilla (`Template`) existente, susti
 
 ## Networking
 - **`Route`:**
-Un objeto nativo de OpenShift, se integra directamente con el `OpenShift Router` (basado en `   `), que actúa como un router de Capa 7 para el tráfico HTTP y HTTPS. Su propósito es exponer servicios (`Service`) externamente al clúster, permitiendo que las aplicaciones sean accesibles desde fuera usando un nombre de host (dominio) y una ruta URL específicos. Las Routes son la implementación de OpenShift para el concepto de Ingress de Kubernetes.
+Un objeto nativo de OpenShift, se integra directamente con el `OpenShift Router` (basado en `HAProxy`), que actúa como un router de Capa 7 para el tráfico HTTP y HTTPS. Su propósito es exponer servicios (`Service`) externamente al clúster, permitiendo que las aplicaciones sean accesibles desde fuera usando un nombre de host (dominio) y una ruta URL específicos. Las Routes son la implementación de OpenShift para el concepto de Ingress de Kubernetes.
 
 - **`oc expose` (cmd:** `oc expose service <nombre_del_servicio>` o `oc expose deployment <nombre_del_deployment> --hostname=mi-app.ejemplo.com`)
 Comando que simplifica la creación de un objeto `Route`. Su función principal es exponer una aplicación a la red externa de forma rápida y sencilla, sin necesidad de escribir manifiestos YAML complejos. Puede crear una `Route` a partir de un `Service`
@@ -68,7 +68,7 @@ Permite que un Pod tenga más de una interfaz de red, cada una conectada a una r
   - **Aislamiento/Seguridad**: Aplicar políticas de red distintas a cada interfaz.
 
 ```yaml
-# En el deployment añadiriamos tras crear el NetworkAttachmentDefinition
+# Añadiriamos al deployment tras crear el NetworkAttachmentDefinition
 annotations:
   k8s.v1.cni.cncf.io/networks: <red1_NAD_nombre>,<red2_NAD_nombre>
 ```
@@ -78,6 +78,8 @@ annotations:
 
 ## Templates
 Los `OpenShift Templates` son una forma de empaquetar y personalizar conjuntos de manifiestos YAML (`Deployment`, `Service`, `Route`, etc.) para su fácil despliegue. Funcionan como plantillas que usan parámetros (parameters) que el usuario rellena al momento de procesarlos con oc process. Son una característica específica de OpenShift, ideal para desplegar aplicaciones preconfiguradas o para simplificar la creación de recursos complejos a usuarios con menos experiencia.
+
+> Las variables dentro del yaml se definen como en bash `${VAR_NAME}`
 
 ```shell
 # 1. Registras el manifiesto del template

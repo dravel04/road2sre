@@ -287,11 +287,11 @@ Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos
   * Sus **tokens se generan automáticamente** y se montan en los Pods.
   * Es crucial aplicar el **Principio del Menor Privilegio**: dar solo los permisos estrictamente necesarios.
 
+> `/etc/kubernetes/manifests` contiene los archivos de manifiesto YAML para los componentes críticos del plano de control (control plane) de Kubernetes.
 
 ## Links
 - [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
-> Definidos en `/etc/kubernetes/manifests`
 - [Multiple Scheduler](https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/)
     - [Advanced Scheduling](https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/)
     - [how-does-kubernetes-scheduler-work](https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work)
