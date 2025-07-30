@@ -54,8 +54,27 @@ Comando que simplifica la creación de un objeto `Route`. Su función principal 
   + `oc expose deployment` -> crea un `Service`
   + `oc expose service` -> crea un `Route`
 
+- **Service Type LoadBalancer**: Este tipo de Service expone tu aplicación de forma externa al provisionar automáticamente un balanceador de carga dedicado. Asigna una IP pública estable que distribuye el tráfico entrante a los Pods de tu aplicación, eliminando la gestión manual de reglas de red o la alta disponibilidad. Es distinto de las Routes de OpenShift, que añaden funcionalidades específicas como la terminación TLS avanzada o el virtual hosting.
+  + `oc expose deployment <nombre-deployment> --port=<puerto-externo> --target-port=<puerto-interno> --type=LoadBalancer [--name=<nombre-service>]`
+
 - **`Endpoints` (cmd:** `oc get endpoints <nombre_del_servicio>` ~ `kubectl get endpoints`)
 Objeto estándar de Kubernetes que representa una lista de direcciones IP y puertos de los Pods que están funcionando y son accesibles para un Service. Los `Endpoints` no se crean directamente por el usuario; son gestionados automáticamente por Kubernetes (y OpenShift) para mantener actualizado el `Service` con la información de los Pods que lo respaldan
+
+### Uso diferentes Networks
+Permite que un Pod tenga más de una interfaz de red, cada una conectada a una red lógica o física diferente. La red principal se obtiene del CNI del clúster (por defecto), y las redes adicionales se configuran mediante recursos como `NetworkAttachmentDefinition` y un plugin CNI como **Multus**.
+- **Propósito**: No se trata de dar acceso "directo" al Pod fuera del clúster (eso lo hacen Services tipo LoadBalancer/NodePort o Ingress/Route). Su objetivo es:
+  - **Separar el tráfico**: Por ejemplo, una interfaz para tráfico de aplicación y otra para gestión, almacenamiento o monitorización.
+  - **Mejorar el rendimiento**: Conectar a redes de alto rendimiento o usar tecnologías como SR-IOV.
+  - **Aislamiento/Seguridad**: Aplicar políticas de red distintas a cada interfaz.
+
+```yaml
+# En el deployment añadiriamos tras crear el NetworkAttachmentDefinition
+annotations:
+  k8s.v1.cni.cncf.io/networks: <red1_NAD_nombre>,<red2_NAD_nombre>
+```
+
+
+**Cuándo es útil**: En escenarios avanzados donde la red única del Pod no es suficiente para las necesidades de rendimiento, seguridad o segregación de tráfico de aplicaciones muy específicas (ej., bases de datos, aplicaciones de red intensivas, telecomunicaciones).
 
 ## Templates
 Los `OpenShift Templates` son una forma de empaquetar y personalizar conjuntos de manifiestos YAML (`Deployment`, `Service`, `Route`, etc.) para su fácil despliegue. Funcionan como plantillas que usan parámetros (parameters) que el usuario rellena al momento de procesarlos con oc process. Son una característica específica de OpenShift, ideal para desplegar aplicaciones preconfiguradas o para simplificar la creación de recursos complejos a usuarios con menos experiencia.
