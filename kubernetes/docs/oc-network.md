@@ -60,8 +60,27 @@ oc annotate configmap <nombre_configmap> service.beta.openshift.io/inject-cabund
     El microservicio que va a recibir las conexiones TLS (el servidor) necesita un certificado para identificarse.
     1. **Modificar el Service del Servidor:**
         - Añade una **anotación específica de OpenShift** al `Service` de tu servidor. Esta anotación le dirá a OpenShift que genere automáticamente un **Secret TLS** que contendrá el certificado y la clave privada para este Service.
+        ```yaml
+        annotations:
+            service.beta.openshift.io/serving-cert-secret-name: <secret_name>
+        ```
     2. **Modificar el Deployment del Servidor:**
         - **Montar el Secret TLS:** Haz que el Pod de tu servidor acceda al **Secret** recién generado. Esto se hace añadiendo una sección de `volumes` y `volumeMounts` en el `Deployment`, apuntando al `Secret` creado en el paso anterior y especificando la ruta donde la aplicación esperará encontrar el certificado y la clave.
+        ```yaml
+        ....
+        spec:
+        containers:
+            - name: stock
+        ....
+            volumeMounts:
+                - name: <volume_name>
+                mountPath: <>
+        volumes:
+            - name: <volume_name>
+            secret:
+                defaultMode: 420
+                secretName: <secret_name>
+        ```
         - **Activar TLS en la Aplicación:** Configura una **variable de entorno** en el contenedor del servidor (ej., `TLS_ENABLED`) para indicarle a tu aplicación que debe escuchar conexiones TLS.
         - **Ajustar Probes:** Si tienes sondas de salud (`livenessProbe`, `readinessProbe`), asegúrate de que ahora usen **HTTPS** en lugar de HTTP para comprobar el estado de tu aplicación.
 
@@ -70,6 +89,17 @@ oc annotate configmap <nombre_configmap> service.beta.openshift.io/inject-cabund
     1. **Modificar el Deployment del Cliente:**
         - **Definir la URL TLS del Servidor:** Añade una **variable de entorno** en el contenedor del cliente con la URL completa del `Service` del servidor, usando el esquema `https://`.
         - **Configurar la Confianza CA:** Añade otra **variable de entorno** que apunte a la ruta estándar del **bundle de certificados CA de confianza de OpenShift** (la CA que firmó el certificado del servidor). Opcionalmente, si el ejercicio lo pide, puedes montar explícitamente el `ConfigMap` `service-ca` en una ruta específica y apuntar a ella.
+        ```yaml
+        # Injectamos el configMap en en todos los pods
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+        name: service-ca
+        namespace: network-review
+        annotations:
+            service.beta.openshift.io/inject-cabundle: "true" # OpenShift entiende que este ConfigMap es el lugar donde debe inyectar el certificado público de su CA de servicio interna
+        data: {} # aunque data este vacio, el Service CA Operator de OpenShift lo detecta y lo rellena automáticamente con el certificado de la CA que usa para firmar los certificados de servicio 
+        ```
 
 3.  **Pasos Adicionales Importantes**
     1. **Tráfico Externo al Cliente (Si aplica):**
