@@ -149,3 +149,15 @@ Cluster Admin pueden configurar **project templates** para añadir recursos a to
 - `ClusterResourceQuota`: Límite agregado estricto de recursos para múltiples Namespaces seleccionados por etiquetas. Solo en OpenShift. Se aplica a **múltiples Namespaces** que cumplen ciertos criterios de selección (basados en etiquetas)
 - `LimitRange`: Establece los valores por defecto y límites máximos/mínimos para requests y limits de contenedores/Pods dentro de un Namespace. Su objetivo es asegurar que los desarrolladores especifiquen límites razonables y evitar que desplieguen Pods sin ellos. Se aplica a un **Namespace único**.
 
+
+## Seguridad
+- `ServiceAccount` (SA) es la identidad que tus aplicaciones (pods) usan para interactuar con la API de Kubernetes, como un "usuario" para el software. Siempre está ligada a un **Namespace**.
+- `ClusterRole` es una colección de permisos que definen qué acciones se pueden realizar sobre recursos a nivel de clúster (o sobre cualquier recurso en todos los **Namespaces**). No es una identidad, solo un listado de permisos.
+
+Para que una **ServiceAccount** pueda usar los permisos definidos en un `ClusterRole`, necesitas un `ClusterRoleBinding`. Este objeto vincula la **ServiceAccount** (la identidad) con el **ClusterRole** (el conjunto de permisos globales), otorgándole a tu aplicación los privilegios necesarios en todo el clúster. Si los permisos son solo a nivel de **Namespace**, se usa un `Role` y un `RoleBinding`.
+
+**Security Context Constraint (SCC)** en OpenShift es una política que controla los permisos de seguridad y las capacidades que un Pod puede tener dentro del clúster o en el host subyacente. Asegura que los contenedores operen con los privilegios mínimos necesarios.
+
+> Si no se especifica una SA se usa la SA `default`
+
+- `oc get <recurso>/<nombre_recurso> -o yaml | oc adm policy scc-subject-review -f -` permite evaluar qué **Security Context Constraint (SCC)** se aplicaría a los pods definidos en el manifiesto de un recurso (como un Deployment), ayudando a diagnosticar problemas de permisos o a prever cómo se ejecutarán las cargas de trabajo bajo las políticas de seguridad del clúster. No indica la SCC que el pod realmente usará si su ServiceAccount no tiene los permisos para esa SCC, es decir, hace falta asigna la política scc a la SA explicitamente (por defecto, usaran la `restricted`)

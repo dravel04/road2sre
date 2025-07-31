@@ -4,6 +4,8 @@ La principal diferencia radica en cómo manejan los cambios en los recursos exis
 - `kubectl create` simplemente crea un nuevo recurso o falla si el recurso ya existe.
 - `kubectl apply` aplica los cambios en el recurso existente o crea uno nuevo si no existe. Es más adecuado para aplicar configuraciones en un entorno donde ya existen recursos y se necesitan actualizaciones sin afectar las partes no modificadas.
 
+> Los **Jobs** son para tareas únicas y finitas, mientras que los **CronJobs** son para tareas programadas y repetitivas.
+
 ## Labels and Selectors
 - **Label:**  Medatada en formato `key-value` que se añade a los recursos de declarados en kubernetes (nodos, pods, etc). Ej: `app=app1`
 - **Selector:** Son los criterios con los que filtramos los recursos destinos. Ej: `kubectl get pods --selector app=app1`
@@ -337,6 +339,8 @@ spec:
   sourceNamespace: openshift-marketplace # El Namespace donde está definido el CatalogSource (común: openshift-marketplace)
   installPlanApproval: Automatic # Estrategia de aprobación de actualizaciones (Automatic o Manual)
 ```
+
+
 
 
 ## Links
