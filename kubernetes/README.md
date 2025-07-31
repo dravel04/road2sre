@@ -289,6 +289,56 @@ Minimiza el riesgo de fallos en producción al exponer la nueva versión a pocos
 
 > `/etc/kubernetes/manifests` contiene los archivos de manifiesto YAML para los componentes críticos del plano de control (control plane) de Kubernetes.
 
+
+## Operators
+**Operator Pattern** extiende Kubernetes para gestionar aplicaciones complejas. Un **Operator** es un controlador específico de una aplicación que usa **Custom Resources** (CRs) para definir el estado deseado de esa aplicación. Este controlador, ejecutándose en el clúster, detecta cambios en los CRs y realiza las acciones necesarias (despliegue, escalado, backups, etc.) para que la aplicación cumpla ese estado deseado.
+
+> El campo **Install Mode** define el ámbito de actuación (scope) de ese Operator una vez que está instalado.
+
+### **OLM (Operator Lifecycle Manager)**
+**OLM (Operator Lifecycle Manager)** es la herramienta que **gestiona los Operators** en OpenShift/Kubernetes. Provee:
+- **Catálogos de Operators**: Para descubrirlos e instalarlos.
+- `Subscription`: Para indicar a OLM qué Operator instalar y cómo actualizarlo.
+- `ClusterServiceVersion` **(CSV)**: Un manifiesto que describe el Operator (CRDs, permisos, despliegue, etc.).
+
+OLM automatiza la instalación, dependencia y actualización de Operators, facilitando su consumo y operación.
+
+- `OperatorGroup` define en qué namespaces específicos un Operator puede observar y gestionar sus Custom Resources. Es un requisito para que OLM instale Operators, asegurando que un Operator solo actúe donde debe y facilitando el multi-tenancy.
+  + Función Clave: Limitar el ámbito de acción del Operator.
+  + Ámbito: Siempre se define dentro del Namespace donde se desplegará el Operator
+```yaml
+---
+# Define el ámbito de acción del Operator en el namespace 'my-database-system'
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: my-database-operator-group # Nombre para tu OperatorGroup
+  namespace: my-database-system # El Namespace donde se desplegará el Operator y observará recursos
+spec:
+  targetNamespaces: # Nombres de los Namespaces que este OperatorGroup observará
+  - my-database-system # En este caso, solo su propio Namespace
+```
+
+- `Subscription` es el "contrato" que le indicas a OLM para que instale un Operator específico y lo mantenga actualizado desde un catálogo. OLM utiliza la información de la Subscription para encontrar el Operator, desplegarlo en el Namespace del OperatorGroup y gestionar sus versiones.
+  + Función Clave: Instalar y actualizar Operators.
+  + Ámbito: Se define dentro del Namespace donde quieres que el Operator se instale.
+```yaml
+---
+# Solicita a OLM la instalación y gestión del Operator
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: my-database-operator-sub # Nombre para tu Subscription
+  namespace: my-database-system # El Namespace donde OLM instalará el Operator (debe coincidir con OperatorGroup)
+spec:
+  channel: stable # El canal de actualizaciones del Operator (ej. 'stable', 'fast', 'v1.x')
+  name: my-database-operator # El nombre del Operator tal como aparece en el catálogo
+  source: community-operators # El nombre del CatalogSource donde OLM debe buscar el Operator
+  sourceNamespace: openshift-marketplace # El Namespace donde está definido el CatalogSource (común: openshift-marketplace)
+  installPlanApproval: Automatic # Estrategia de aprobación de actualizaciones (Automatic o Manual)
+```
+
+
 ## Links
 - [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
