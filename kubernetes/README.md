@@ -341,8 +341,6 @@ spec:
 ```
 
 
-
-
 ## Links
 - [Courses roadmap](./roadmap.md)
 - [Statics pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/)
