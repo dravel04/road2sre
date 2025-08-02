@@ -6,22 +6,31 @@ La principal diferencia radica en cómo manejan los cambios en los recursos exis
 
 > Los **Jobs** son para tareas únicas y finitas, mientras que los **CronJobs** son para tareas programadas y repetitivas.
 
-## Labels and Selectors
-- **Label:**  Medatada en formato `key-value` que se añade a los recursos de declarados en kubernetes (nodos, pods, etc). Ej: `app=app1`
-- **Selector:** Son los criterios con los que filtramos los recursos destinos. Ej: `kubectl get pods --selector app=app1`
+## **Labels y Selectors**
+- **`Label`**: Metadato en formato `key-value` que se añade a los recursos de Kubernetes (nodos, pods, etc.). **Ej**: `app=app1`.
+- **`Selector`**: Criterio para filtrar recursos por sus `labels`. **Ej**: `kubectl get pods --selector app=app1`.
 
-Esta funcionalidad nos ayuda a asegurar que un grupo de pods corran en un nodo con concreto con [`NodeAffinity`](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
-- `NodeAffinity` utiliza `Labels` en los nodos (mediante `Selectors`) para definir las reglas de afinidad. Es el mecanismo para atraer `Pods` hacia nodos con características específicas.
+Esta funcionalidad, junto con **`NodeAffinity`**, nos ayuda a asegurar que un grupo de pods corra en nodos con características específicas. `NodeAffinity` es un mecanismo de **atracción**, que usa `labels` para atraer pods a ciertos nodos.
 
-La diferencia con `Taints and Tolerations` es que estos te garantizan que tus pods acaben en los nodos seleccionados. Es decir, una combinación de ambos aseguran que solo los pods con la etiqueta y la tolerancia definida acaben en los nodos deseados
-- Actúan como una barrera. Utilizan una lógica similar a key=value (`key=value:effect`) pero en los nodos, para repeler a los Pods que no quieres que usen el nodo, a menos que el Pod "tenga un pase" (la `Toleration`). 
+### **Taints y Tolerations**
+- **`Taints` y `Tolerations`** son el mecanismo de **repulsión**. Actúan como una barrera que expulsa a los pods de un nodo.
+- **`Taint`**: Una "mancha" en un nodo (`key=value:effect`) que repela a los pods. Los `Taints` evitan que los pods se programen en el nodo, a menos que el pod tenga un `Toleration` que "perdone" esa mancha.
+- **`Toleration`**: Una propiedad en un pod que le permite "tolerar" un `taint`, superando así la barrera y pudiendo ser programado en el nodo.
+
+### **La Diferencia Clave**
+- **Atracción (`NodeAffinity`)**: Busca nodos que cumplan con un criterio. Es un mecanismo **positivo**. Sin embargo, cualquier otro pod sin `nodeAffinity` aún podría programarse en ese nodo si está disponible.
+- **Repulsión (`Taints` y `Tolerations`)**: Evita que los pods se programen en nodos que no quieres que usen. Es un mecanismo **negativo**.
+
+Para **dedicar un nodo de forma exclusiva** a un pod o grupo de pods, debes combinar ambos:
+- Usas **`NodeAffinity`** para **atraer** a los pods correctos.
+- Usas **`Taints` y `Tolerations`** para **repeler** a todos los demás.
 
 > [!NOTE]
-> Sólo puedes modificar las siguientes propiedades de un POD existenten, para el resto tienes que borrar y recrear el pods
-> spec.containers[*].image
-> spec.initContainers[*].image
-> spec.activeDeadlineSeconds
-> spec.tolerations
+> Solo puedes modificar las siguientes propiedades de un pod existente. Para el resto de cambios, debes borrar y recrear el pod:
+> - `spec.containers[*].image`
+> - `spec.initContainers[*].image`
+> - `spec.activeDeadlineSeconds`
+> - `spec.tolerations`
 
 ## DaemonSet
 Es una definición que asegura que exista una copia del pods en **CADA UNO** de los nodos del cluster
