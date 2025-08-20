@@ -138,6 +138,26 @@ kubectl create rolebinding <nombre-rb> --role=<nombre-role> --serviceaccount=<na
 ```
 4. Usar la SA: Asigna la SA al Pod o Deployment para que tu aplicación herede esos permisos. En el YAML del Pod/Deployment: `spec.template.spec.serviceAccountName: <nombre-sa>`
 
+### Proceso de Autenticación en OpenShift con OIDC
+
+- `oc login` te lleva al navegador para que te autentiques en tu proveedor de identidad (**IdP**). Esto es el flujo de autorización de **OAuth**.
+- Una vez autenticado, el proveedor te entrega un `ID Token` y un `Refresh Token`. La entrega y validación de estos tokens es el protocolo de **OIDC**.
+- Tu archivo `kubeconfig` guarda el `Refresh Token` y la configuración de **OIDC**.
+- Cuando usas `kubectl`, si tu token actual ha caducado, `kubectl` usa el `Refresh Token` para conseguir uno nuevo de forma automática, sin que tengas que volver a iniciar sesión.
+
+En resumen:
+- **OAuth** maneja la redirección y el permiso.
+- **OIDC** gestiona la identidad y los tokens.
+- El `Refresh Token` en tu `kubeconfig` te permite mantener la sesión a largo plazo.
+
+#### Mapeo de Usuarios con [OIDC Claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims)
+Los **claims de OIDC** son pares de clave-valor que el proveedor de identidad (IdP) envía a OpenShift en el ID Token. OpenShift lee estos claims para crear y gestionar los objetos de usuario, identidad y grupo del clúster.
+- **Identidad del Usuario**: Debes configurar un claim para que OpenShift lo use como el identificador único del usuario. Por defecto, OpenShift usa el claim `sub` (subject identifier).
+- **Detalles del Perfil**: Puedes configurar claims adicionales para obtener el nombre de usuario (`preferred_username`), el nombre completo (`name`) o el correo electrónico (`email`). OpenShift procesa estos claims en el orden que los definas y usa el primer valor que no esté vacío.
+
+Este mapeo es lo que permite que un usuario en tu proveedor de identidad (por ejemplo, con `preferred_username: "ana.lopez"`) sea reconocido como un usuario válido en tu clúster de OpenShift.
+
+
 ## [Network Security](./oc-network.md)
 
 ## Limitar Workloads

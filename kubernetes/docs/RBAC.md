@@ -45,5 +45,21 @@ Los permisos (Roles) se asignan a los grupos para simplificar la gestión de acc
 
 ## Consideraciones Importantes sobre Proveedores de Identidad (IdP)
 - **HTPasswd IdP**: Útil para aprendizaje y laboratorios por su simplicidad. No es para producción por la falta de MFA, SSO, y gestión centralizada.
-- **En Producción**: Se usan IdPs externos (LDAP, Active Directory, OIDC como Okta) para gestionar usuarios humanos. Ofrecen seguridad avanzada, escalabilidad y funcionalidades empresariales.
+- **En Producción**: Se usan IdPs externos (LDAP, Active Directory, Okta) para gestionar usuarios humanos. Ofrecen seguridad avanzada, escalabilidad y funcionalidades empresariales.
 - El `kubeconfig` (o `oc login`) es la llave de acceso para usuarios humanos. Debe protegerse rigurosamente, preferentemente usando **tokens de corta duración** y **MFA** para el re-login.
+
+Cuando OpenShift tiene varios proveedores de identidad (IdPs) configurados, es posible que dos IdPs diferentes envíen el mismo nombre de usuario para dos personas distintas. Para evitar estos conflictos, OpenShift usa el parámetro `mappingMethod` en el recurso `kind: OAuth`. Existen tres métodos de mapeo:
+- `claim` (**por defecto**): OpenShift crea un usuario con el nombre de usuario que recibe del IdP. Sin embargo, si un usuario con ese mismo nombre ya existe y está asociado a otro IdP, el intento de login fallará. Este es el comportamiento más seguro para evitar ambigüedades.
+- `add`: OpenShift crea el usuario si no existe. Pero si un usuario con ese nombre ya existe, OpenShift asocia la nueva identidad al usuario existente. Es útil cuando sabes que los IdPs usan los mismos nombres de usuario para las mismas personas y quieres que se vinculen a una única cuenta en OpenShift.
+- `lookup`: OpenShift no crea usuarios ni identidades automáticamente. Simplemente busca un usuario que ya exista con ese nombre. Si no lo encuentra, el login falla. Con este método, los administradores deben crear los usuarios de forma manual (o con un proceso externo) antes de que puedan iniciar sesión. Esto da un control total sobre la creación de usuarios.
+
+## Authentication by Using LDAP
+
+La autenticación mediante LDAP en OpenShift permite que tu clúster valide las credenciales de los usuarios usando un servidor LDAP remoto de tu organización. Esto se configura a través de un Identity Provider (IdP) de tipo LDAP en el recurso `kind: OAuth` de OpenShift.
+
+Para configurar esta conexión, necesitas una URI LDAP (ldap:// o ldaps:// para SSL/TLS). Esta URI especifica el servidor (`host:port`), la ubicación base de la búsqueda (`basedn`), los atributos a buscar (`attributes`), el alcance de la búsqueda (scope, 'one' para un nivel, 'sub' para subárboles) y filtros opcionales (`filter`) para refinar los resultados (ej. (`objectClass=person`). A menudo, se requieren credenciales administrativas (bind DN) dentro de la URI para que OpenShift pueda realizar las consultas.
+```
+ldapsearch ... ldap://host:port/basedn?attribute?scope?filter
+```
+Ex: `ldap://ldap.example.com:389/dc=example,dc=com?givenName,sn,cn?(uid=payden.tomcheck)`
+

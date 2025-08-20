@@ -349,6 +349,46 @@ spec:
   installPlanApproval: Automatic # Estrategia de aprobación de actualizaciones (Automatic o Manual)
 ```
 
+## Configurar `kubeconfig`
+### Paso 1: Crea la ServiceAccount y sus Permisos
+
+Primero, necesitas una identidad de bot y las reglas de permisos que debe seguir.
+```Bash
+# 1. Crea la ServiceAccount en el namespace 'default'
+kubectl create sa my-robot-sa -n default
+
+# 2. Crea un ClusterRole con permisos de "solo lectura" en pods para todo el clúster
+kubectl create clusterrole pod-reader-cluster --verb=get,list,watch --resource=pods
+
+# 3. Asigna ese ClusterRole a la ServiceAccount
+kubectl create clusterrolebinding pod-reader-cluster-binding --clusterrole=pod-reader-cluster --serviceaccount=default:my-robot-sa
+```
+
+### Paso 2: Genera un Token para la ServiceAccount
+
+Este token es la "contraseña" de tu bot.
+```Bash
+# Genera un token de corta duración para la SA y lo guarda en una variable
+ROBOT_TOKEN=$(kubectl create token my-robot-sa -n default)
+```
+
+### Paso 3: Crea el Archivo kubeconfig
+
+Ahora, usando el token que acabamos de crear, construyes el archivo de configuración. Este archivo será independiente de tu kubeconfig principal.
+
+```Bash
+# 1. Configura el clúster (obteniendo los detalles del clúster actual)
+kubectl config set-cluster my-cluster --server="$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')" --kubeconfig=robot.kubeconfig
+
+# 2. Configura las credenciales con el token de la ServiceAccount
+kubectl config set-credentials my-robot-sa --token="$ROBOT_TOKEN" --kubeconfig=robot.kubeconfig
+
+# 3. Crea el contexto y lo activa por defecto
+kubectl config set-context my-robot-context --cluster=my-cluster --user=my-robot-sa --namespace=default --kubeconfig=robot.kubeconfig
+kubectl config use-context my-robot-context --kubeconfig=robot.kubeconfig
+```
+
+Una vez completado este proceso, tendrás un archivo llamado robot.kubeconfig que contiene todo lo necesario para que un script o una herramienta externa se autentique como `my-robot-sa` y acceda a todos los pods del cluster
 
 ## Links
 - [Courses roadmap](./roadmap.md)
