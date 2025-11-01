@@ -1,0 +1,24 @@
+site_name: Ansible101
+theme:
+  features:
+    - navigation.expand
+  name: material
+  font:
+    text: Roboto
+    code: Roboto Mono
+  palette: 
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+nav:
+  - Home: index.md
+  - Guías:
+      - Introducción: introduccion.md
+      - Instalación: instalacion.md

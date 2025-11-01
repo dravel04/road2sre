@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Web</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            height: 100vh;
+        }
+        #terminal-container, #docs-container {
+            flex: 1;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #terminal-container {
+            border-right: 1px solid #ccc;
+            overflow: hidden;
+        }
+        #docs-container {
+            overflow: auto;
+        }
+        #terminal {
+            width: 100%;
+            height: 100%;
+            padding-left: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div id="terminal"></div> -->
+    <section id="docs-container">
+        <iframe src="./site/index.html" style="width: 100%; height: 100%; border: none;"></iframe>
+    </section>
+    <section id="terminal-container">
+        <div id="terminal"></div>
+    </section>
+    <script>
+        const terminal = new Terminal({
+            cursorBlink: true,
+            cols: 80,
+            rows: 24,
+        });
+        terminal.open(document.getElementById('terminal'));
+
+        // const socket = io('ws://localhost:5005');
+        const socket = io('http://localhost:5005', {
+            path: '/api/socket.io'
+        });
+
+        let inputBuffer = '';
+        let currentPath = 'Ansible101/webapp';
+
+        // Función para mostrar el prompt
+        function showPrompt() {
+            terminal.write(`\r\n${currentPath} $ `);
+        }
+
+        // Mostrar el primer prompt al iniciar
+        showPrompt();
+        socket.on('connect', () => {
+            terminal.write('\r\n[Conectado al servidor Flask]\r\n');
+            showPrompt();
+        });
+
+        // Manejar la respuesta del servidor
+        socket.on('response', function(data) {
+            // Limpia saltos de línea duplicados
+            const clean = data.replace(/\r?\n/g, '\r\n');
+
+            // Si detecta que es el final del proceso, muestra el prompt
+            if (clean.includes('[Proceso terminado')) {
+                terminal.write(`\r\n${clean}`);
+                showPrompt();
+            } else {
+                terminal.write(clean);
+            }
+        });
+
+
+
+        // Capturar la entrada del usuario
+        terminal.onData(data => {
+            if (data === '\r') {  // Si se presiona Enter
+                socket.send(inputBuffer);  // Enviar el comando al servidor
+                inputBuffer = '';  // Limpiar el buffer después de enviar el comando
+            } else if (data === '\u007F') {  // Manejar la tecla de retroceso
+                if (inputBuffer.length > 0) {
+                    inputBuffer = inputBuffer.slice(0, -1);
+                    terminal.write('\b \b');  // Eliminar el último carácter en el terminal
+                }
+            } else {
+                inputBuffer += data;
+                terminal.write(data);
+            }
+        });
+    </script>
+</body>
+</html>
